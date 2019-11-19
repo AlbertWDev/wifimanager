@@ -1,0 +1,32 @@
+menu "WiFi Manager"
+
+config WM_DEFAULT_HOSTNAME
+    string "Default hostname"
+    default "Esp32"
+    help
+        TCP/IP adapter hostname. Less than 32 characters.
+
+
+menu "Access Point"
+
+config WM_AP_DNS_URL
+    string "Host domain"
+    default "http://esp32.config"
+    help
+        Domain that all DNS requests will point to when the board is
+        in AP mode for network credentials configuration.
+
+endmenu
+
+menu "NVS Storage"
+
+config WM_STORAGE_MAX_NETWORKS
+    int "Storage max number of networks"
+    default 5
+    help
+        Number of network credentials that can be stored in the NVS
+        partition.
+
+endmenu
+
+endmenu
