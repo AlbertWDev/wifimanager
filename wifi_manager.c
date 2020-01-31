@@ -68,8 +68,10 @@ static void _event_handler(void* arg, esp_event_base_t event_base,
                 ip_event_got_ip_t* event = (ip_event_got_ip_t*)event_data;
                 ESP_LOGI(TAG, "Connected! [%s]", ip4addr_ntoa(&event->ip_info.ip));
                 
-                // Update times used to improve this network internal score
                 if(wm_available_valid()) {
+                    // Connected, reset retry count
+                    _wm_available.retries = 0;
+                    // Update times used to improve this network internal score
                     _wm_available.networks[_wm_available.index].times_used++;
                     wm_storage_save(&_wm_available.networks[_wm_available.index]);
                 }
