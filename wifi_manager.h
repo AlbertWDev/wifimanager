@@ -2,6 +2,7 @@
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include "freertos/event_groups.h"
 #include <esp_system.h>
 #include <esp_wifi.h>
 #include <esp_event.h>
@@ -21,6 +22,9 @@
 #define WM_DEFAULT_AP_PASSWORD  "WM_pa55w0rd"
 #define WM_CONNECTION_MAX_RETRIES 2
 #define WM_SCAN_MAX_NETWORKS 20
+
+#define WM_STA_CONNECTED_BIT BIT0
+//#define WM_AP_STARTED_BIT    BIT1
 
 
 typedef struct ssl_certs_t {
@@ -72,6 +76,8 @@ struct {
 
 uint8_t wm_sta_started;
 
+
+bool wm_sta_connected();
 
 /*
  * Initialize the WiFiManager

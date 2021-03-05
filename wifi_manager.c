@@ -4,8 +4,11 @@ static const char *TAG = "WiFiManager";
 
 wm_config_t* _wm_config = NULL;
 wm_network_info_t wm_network_info_default = {.times_used = 0};
+static EventGroupHandle_t _wm_event_group;
 
-
+bool wm_sta_connected() {
+    return xEventGroupGetBits(_wm_event_group) & WM_STA_CONNECTED_BIT;
+}
 
 static inline bool wm_available_valid() {
     return _wm_available.count > 0 && _wm_available.index < _wm_available.count;
@@ -65,6 +68,8 @@ static void _event_handler(void* arg, esp_event_base_t event_base,
     } else if(event_base == IP_EVENT) {
         switch(event_id) {
             case IP_EVENT_STA_GOT_IP:;
+                xEventGroupSetBits(_wm_event_group, WM_STA_CONNECTED_BIT);
+
                 ip_event_got_ip_t* event = (ip_event_got_ip_t*)event_data;
                 ESP_LOGI(TAG, "Connected! [%s]", ip4addr_ntoa(&event->ip_info.ip));
                 
@@ -76,12 +81,17 @@ static void _event_handler(void* arg, esp_event_base_t event_base,
                     wm_storage_save(&_wm_available.networks[_wm_available.index]);
                 }
                 break;
+            case IP_EVENT_STA_LOST_IP:;
+                xEventGroupClearBits(_wm_event_group, WM_STA_CONNECTED_BIT);
+                break;
         }
     }
 }
 
 esp_err_t wm_init(wm_config_t* wm_config) {
     esp_err_t err;
+
+    _wm_event_group = xEventGroupCreate();
 
     // Copy configuration and apply component default values
     _wm_config = (wm_config_t*)malloc(sizeof(wm_config_t));
